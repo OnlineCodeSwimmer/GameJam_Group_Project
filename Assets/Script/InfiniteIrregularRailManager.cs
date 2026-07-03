@@ -12,6 +12,10 @@ public class InfiniteIrregularRailManager : MonoBehaviour
     public Vector2 gapRange = new Vector2(2f, 5f);
     public Vector2 heightRange = new Vector2(-2f, 4f);
     public float maxHeightStep = 2.5f;
+    public BoxCollider2D failZoneCollider;
+    public float failZoneY = -6f;
+    public float failZoneHeight = 1.5f;
+    public float failZonePadding = 20f;
 
     public bool useDebugPattern = true;
     public float[] debugHeights = { 0f, 0f, 1.2f, 2.4f, 0f, 3f, -0.8f, 1.5f };
@@ -46,6 +50,7 @@ public class InfiniteIrregularRailManager : MonoBehaviour
         lastHeight = vehicle.position.y;
 
         SpawnUntilPreloaded();
+        UpdateFailZone();
     }
 
     private void Update()
@@ -57,6 +62,7 @@ public class InfiniteIrregularRailManager : MonoBehaviour
 
         SpawnUntilPreloaded();
         RecycleOldSegments();
+        UpdateFailZone();
     }
 
     private void SpawnUntilPreloaded()
@@ -153,6 +159,26 @@ public class InfiniteIrregularRailManager : MonoBehaviour
             oldSegment.transform.SetParent(transform, true);
             pool.Enqueue(oldSegment);
         }
+    }
+
+    private void UpdateFailZone()
+    {
+        if (failZoneCollider == null)
+        {
+            return;
+        }
+
+        float leftX = vehicle.position.x - recycleDistance - failZonePadding;
+        float rightX = Mathf.Max(nextSpawnX, vehicle.position.x + preloadDistance) + failZonePadding;
+        float width = Mathf.Max(1f, rightX - leftX);
+        float centerX = (leftX + rightX) * 0.5f;
+
+        Transform failZoneTransform = failZoneCollider.transform;
+        failZoneTransform.position = new Vector3(centerX, failZoneY, failZoneTransform.position.z);
+        failZoneTransform.localScale = Vector3.one;
+        failZoneCollider.isTrigger = true;
+        failZoneCollider.offset = Vector2.zero;
+        failZoneCollider.size = new Vector2(width, failZoneHeight);
     }
 
     private void OnDrawGizmos()

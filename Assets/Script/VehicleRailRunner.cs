@@ -12,6 +12,7 @@ public class VehicleRailRunner : MonoBehaviour
     public float gravityScaleInAir = 3f;
     public float contactRadius = 0.12f;
     public float failY = -6f;
+    public bool useFailYFallback = false;
     public LayerMask railLayer;
     public Transform railContactPoint;
     public bool inputEnabled = true;
@@ -29,6 +30,7 @@ public class VehicleRailRunner : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
+        Time.timeScale = 1f;
 
         if (railContactPoint == null)
         {
@@ -73,7 +75,7 @@ public class VehicleRailRunner : MonoBehaviour
             rb.gravityScale = gravityScaleInAir;
         }
 
-        if (transform.position.y < failY)
+        if (useFailYFallback && transform.position.y < failY)
         {
             FailAndFall();
         }
@@ -142,6 +144,19 @@ public class VehicleRailRunner : MonoBehaviour
 
     public void FailAndFall()
     {
+        GameOver("Game Over: Vehicle missed the rail.");
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("FailZone"))
+        {
+            GameOver("Game Over: Vehicle touched FailZone.");
+        }
+    }
+
+    private void GameOver(string message)
+    {
         if (failed)
         {
             return;
@@ -150,10 +165,12 @@ public class VehicleRailRunner : MonoBehaviour
         failed = true;
         inputEnabled = false;
         grounded = false;
-        rb.gravityScale = gravityScaleInAir;
-        rb.velocity = new Vector2(moveSpeed * 0.5f, rb.velocity.y);
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 0f;
+        rb.simulated = false;
+        Time.timeScale = 0f;
 
-        Debug.Log("Game Over: Vehicle missed the rail.");
+        Debug.Log(message);
     }
 
     private bool WasJumpPressed()
