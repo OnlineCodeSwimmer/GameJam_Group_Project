@@ -1080,7 +1080,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10873be09b0b49fd868bd843e62175c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  moveSpeed: 15
   jumpVelocity: 20
   gravityScaleInAir: 3
   contactRadius: 0.12
