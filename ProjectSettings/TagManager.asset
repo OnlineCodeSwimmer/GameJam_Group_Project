@@ -42,3 +42,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Track
+    uniqueID: 2996598265
+    locked: 0
+  - name: Player
+    uniqueID: 1074162121
+    locked: 0
+  - name: Bullet
+    uniqueID: 2394822749
+    locked: 0
